@@ -22,8 +22,10 @@ import { checkAuth } from "./store/auth-slice";
 import { ToastContainer } from 'react-toastify';
 
 import PaypalReturnPage from "./pages/shopping-view/paypal-return.jsx";
+import PaypalCancelPage from "./pages/shopping-view/paypal-cancel.jsx";
 import PaymentSuccessPage from "./pages/shopping-view/payment-success";
 import SearchProducts from "./pages/shopping-view/search";
+import AiChatAssistant from "./components/shopping-view/AiChatAssistant";
 
 function App() {
   const { user, isAuthenticated, isLoading } = useSelector(
@@ -89,6 +91,7 @@ function App() {
           <Route path="checkout" element={<ShoppingCheckout />} />
           <Route path="account" element={<ShoppingAccount />} />
           <Route path="paypal-return" element={<PaypalReturnPage />} />
+          <Route path="paypal-cancel" element={<PaypalCancelPage />} />
           <Route path="payment-success" element={<PaymentSuccessPage />} />
           <Route path="search" element={<SearchProducts />} />
         </Route>
@@ -104,6 +107,7 @@ function App() {
         pauseOnHover
         draggable
       />
+      <AiChatAssistant />
     </div>
   );
 }

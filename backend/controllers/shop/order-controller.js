@@ -5,6 +5,14 @@ const Product = require("../../models/Product");
 
 const createOrder = async (req, res) => {
   try {
+    const clientUrl = req.get("origin") || process.env.CLIENT_URL;
+    if (!clientUrl) {
+      return res.status(500).json({
+        success: false,
+        message:
+          "CLIENT_URL is not configured and request origin is missing. Set CLIENT_URL or send an Origin header.",
+      });
+    }
     const {
       userId,
       cartItems,
@@ -26,8 +34,8 @@ const createOrder = async (req, res) => {
         payment_method: "paypal",
       },
       redirect_urls: {
-        return_url: "http://localhost:5173/shop/paypal-return",
-        cancel_url: "http://localhost:5173/shop/paypal-cancel",
+        return_url: `${clientUrl}/shop/paypal-return`,
+        cancel_url: `${clientUrl}/shop/paypal-cancel`,
       },
       transactions: [
         {

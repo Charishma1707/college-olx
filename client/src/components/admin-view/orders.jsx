@@ -32,8 +32,6 @@ function AdminOrdersView() {
     dispatch(getAllOrdersForAdmin());
   }, [dispatch]);
 
-  console.log(orderDetails, "orderList");
-
   useEffect(() => {
     if (orderDetails !== null) setOpenDetailsDialog(true);
   }, [orderDetails]);
@@ -59,17 +57,22 @@ function AdminOrdersView() {
           <TableBody>
             {orderList && orderList.length > 0
               ? orderList.map((orderItem) => (
-                  <TableRow>
+                  <TableRow key={orderItem?._id}>
                     <TableCell>{orderItem?._id}</TableCell>
                     <TableCell>{orderItem?.orderDate.split("T")[0]}</TableCell>
                     <TableCell>
                       <Badge
                         className={`py-1 px-3 ${
-                          orderItem?.orderStatus === "confirmed"
-                            ? "bg-green-500"
-                            : orderItem?.orderStatus === "rejected"
+                          orderItem?.orderStatus === "delivered"
+                            ? "bg-green-600"
+                            : orderItem?.orderStatus === "inShipping"
+                            ? "bg-blue-600"
+                            : orderItem?.orderStatus === "inProcess"
+                            ? "bg-amber-600"
+                            : orderItem?.orderStatus === "rejected" ||
+                              orderItem?.orderStatus === "cancelled"
                             ? "bg-red-600"
-                            : "bg-black"
+                            : "bg-zinc-900"
                         }`}
                       >
                         {orderItem?.orderStatus}

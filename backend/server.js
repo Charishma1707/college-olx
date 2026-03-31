@@ -20,17 +20,30 @@ const shopReviewRouter = require("./routes/shop/review-routes");
 const app = express();
 const PORT = process.env.PORT || 5000;
 const _dirname=path.resolve();
+const allowedOrigins = (process.env.CORS_ORIGINS || process.env.CLIENT_URL || "")
+  .split(",")
+  .map((s) => s.trim())
+  .filter(Boolean);
 
 // Connect to MongoDB
 mongoose
-  .connect(process.env.MONGO_URL, { useNewUrlParser: true, useUnifiedTopology: true })
+  .connect(process.env.MONGO_URL)
   .then(() => console.log("✅ MongoDB connected"))
   .catch((err) => console.error("❌ MongoDB connection error:", err));
 
 // CORS middleware
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: (origin, callback) => {
+      // allow non-browser clients (Postman, curl)
+      if (!origin) return callback(null, true);
+
+      // if not configured, allow all origins (dev convenience)
+      if (allowedOrigins.length === 0) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      return callback(new Error("Not allowed by CORS"));
+    },
     methods: ["GET", "POST", "DELETE", "PUT"],
     allowedHeaders: [
       "Content-Type",
@@ -46,6 +59,11 @@ app.use(
 app.use(cookieParser());
 app.use(express.json());
 
+// Health check (test in Postman: GET http://localhost:5000/api)
+app.get("/api", (req, res) => {
+  res.json({ success: true, message: "API is running", baseUrl: "/api" });
+});
+
 // Routes
 app.use("/api/auth", authRouter);
 app.use("/api/admin/products", adminProductsRouter);
@@ -58,6 +76,7 @@ app.use("/api/common/feature", commonFeatureRouter);
 app.use("/api/shop/address", shopAddressRouter);
 app.use("/api/shop/order", shopOrderRouter);
 app.use("/api/shop/search", shopSearchRouter);
+app.use("/api/shop/review", shopReviewRouter);
 
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../client/dist")));

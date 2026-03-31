@@ -11,6 +11,8 @@ const ProductSchema = new mongoose.Schema(
     salePrice: Number,
     totalStock: Number,
     averageReview: Number,
+    /** CLIP embedding for multimodal semantic search (512 dimensions) */
+    embedding: [Number],
   },
   { timestamps: true }
 );

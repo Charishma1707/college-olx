@@ -10,7 +10,7 @@ import {
   getOrderDetailsForAdmin,
   updateOrderStatus,
 } from "@/store/admin/order-slice";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 
 const initialFormData = {
   status: "",
@@ -21,8 +21,6 @@ function AdminOrderDetailsView({ orderDetails }) {
   const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
-
-  console.log(orderDetails, "orderDetailsorderDetails");
 
   function handleUpdateStatus(event) {
     event.preventDefault();
@@ -35,9 +33,9 @@ function AdminOrderDetailsView({ orderDetails }) {
         dispatch(getOrderDetailsForAdmin(orderDetails?._id));
         dispatch(getAllOrdersForAdmin());
         setFormData(initialFormData);
-        toast({
-          title: data?.payload?.message,
-        });
+        toast.success(data?.payload?.message ?? "Order status updated");
+      } else {
+        toast.error(data?.payload?.message ?? "Failed to update order status");
       }
     });
   }
@@ -71,11 +69,16 @@ function AdminOrderDetailsView({ orderDetails }) {
             <Label>
               <Badge
                 className={`py-1 px-3 ${
-                  orderDetails?.orderStatus === "confirmed"
-                    ? "bg-green-500"
-                    : orderDetails?.orderStatus === "rejected"
+                  orderDetails?.orderStatus === "delivered"
+                    ? "bg-green-600"
+                    : orderDetails?.orderStatus === "inShipping"
+                    ? "bg-blue-600"
+                    : orderDetails?.orderStatus === "inProcess"
+                    ? "bg-amber-600"
+                    : orderDetails?.orderStatus === "rejected" ||
+                      orderDetails?.orderStatus === "cancelled"
                     ? "bg-red-600"
-                    : "bg-black"
+                    : "bg-zinc-900"
                 }`}
               >
                 {orderDetails?.orderStatus}
@@ -90,7 +93,7 @@ function AdminOrderDetailsView({ orderDetails }) {
             <ul className="grid gap-3">
               {orderDetails?.cartItems && orderDetails?.cartItems.length > 0
                 ? orderDetails?.cartItems.map((item) => (
-                    <li className="flex items-center justify-between">
+                    <li className="flex items-center justify-between" key={item?.productId}>
                       <span>Title: {item.title}</span>
                       <span>Quantity: {item.quantity}</span>
                       <span>Price: ${item.price}</span>
@@ -126,6 +129,7 @@ function AdminOrderDetailsView({ orderDetails }) {
                   { id: "inProcess", label: "In Process" },
                   { id: "inShipping", label: "In Shipping" },
                   { id: "delivered", label: "Delivered" },
+                    { id: "cancelled", label: "Cancelled" },
                   { id: "rejected", label: "Rejected" },
                 ],
               },

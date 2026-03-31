@@ -64,7 +64,27 @@ const updateOrderStatus = async (req, res) => {
       });
     }
 
-    await Order.findByIdAndUpdate(id, { orderStatus });
+    const allowedStatuses = [
+      "pending",
+      "inProcess",
+      "inShipping",
+      "delivered",
+      "confirmed",
+      "rejected",
+      "cancelled",
+    ];
+
+    if (!allowedStatuses.includes(orderStatus)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid order status",
+      });
+    }
+
+    await Order.findByIdAndUpdate(id, {
+      orderStatus,
+      orderUpdateDate: new Date(),
+    });
 
     res.status(200).json({
       success: true,

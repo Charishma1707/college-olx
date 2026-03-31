@@ -138,12 +138,14 @@ function ShoppingListing() {
     if (productDetails !== null) setOpenDetailsDialog(true);
   }, [productDetails]);
 
-  console.log(productList, "productListproductListproductList");
-
   return (
-    <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-6 p-4 md:p-6">
-      <ProductFilter filters={filters} handleFilter={handleFilter} />
-      <div className="bg-background w-full rounded-lg shadow-sm">
+    <div className="min-h-screen bg-muted/20">
+      <div className="grid grid-cols-1 md:grid-cols-[240px_1fr] gap-6 p-4 md:p-8 container mx-auto">
+      <div className="rounded-2xl border bg-white/70 shadow-sm p-4 h-fit">
+        <h2 className="text-lg font-extrabold mb-4">Filters</h2>
+        <ProductFilter filters={filters} handleFilter={handleFilter} />
+      </div>
+      <div className="bg-background/80 w-full rounded-2xl border shadow-sm overflow-hidden">
         <div className="p-4 border-b flex items-center justify-between">
           <h2 className="text-lg font-extrabold">All Products</h2>
           <div className="flex items-center gap-3">
@@ -176,10 +178,11 @@ function ShoppingListing() {
             </DropdownMenu>
           </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6 p-6">
           {productList && productList.length > 0
             ? productList.map((productItem) => (
                 <ShoppingProductTile
+                  key={productItem?._id}
                   handleGetProductDetails={handleGetProductDetails}
                   product={productItem}
                   handleAddtoCart={handleAddtoCart}
@@ -193,6 +196,7 @@ function ShoppingListing() {
         setOpen={setOpenDetailsDialog}
         productDetails={productDetails}
       />
+      </div>
     </div>
   );
 }

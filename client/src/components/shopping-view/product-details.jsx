@@ -1,4 +1,3 @@
-import { StarIcon } from "lucide-react";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { Dialog, DialogContent } from "../ui/dialog";
@@ -7,11 +6,12 @@ import { Input } from "../ui/input";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart, fetchCartItems } from "@/store/shop/cart-slice";
 import { toast } from "react-toastify";
-import { setProductDetails } from "@/store/shop/products-slice";
+import { fetchProductDetails, setProductDetails } from "@/store/shop/products-slice";
 import { Label } from "../ui/label";
 import StarRatingComponent from "../common/star-rating";
 import { useEffect, useState } from "react";
 import { addReview, getReviews } from "@/store/shop/review-slice";
+import RecommendationStrip from "./RecommendationStrip";
 
 function ProductDetailsDialog({ open, setOpen, productDetails }) {
   const [reviewMsg, setReviewMsg] = useState("");
@@ -76,15 +76,25 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
         reviewMessage: reviewMsg,
         reviewValue: rating,
       })
-    ).then((data) => {
-      if (data.payload.success) {
-        setRating(0);
-        setReviewMsg("");
-        dispatch(getReviews(productDetails?._id));
-        toast.success( "Review added successfully!"
-        );
-      }
-    });
+    )
+      .unwrap()
+      .then((payload) => {
+        if (payload?.success) {
+          setRating(0);
+          setReviewMsg("");
+          dispatch(getReviews(productDetails?._id));
+          toast.success(payload?.message ?? "Review added successfully!");
+        } else {
+          toast.error(payload?.message ?? "Could not add review");
+        }
+      })
+      .catch((err) => {
+        const message =
+          err?.response?.data?.message ??
+          err?.message ??
+          "Could not add review";
+        toast.error(message);
+      });
   }
 
   useEffect(() => {
@@ -160,12 +170,16 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
             )}
           </div>
           <Separator />
+          <RecommendationStrip
+            userId={user?.id}
+            onPickProduct={(id) => dispatch(fetchProductDetails(id))}
+          />
           <div className="max-h-[300px] overflow-auto">
             <h2 className="text-xl font-bold mb-4">Reviews</h2>
             <div className="grid gap-6">
               {reviews && reviews.length > 0 ? (
                 reviews.map((reviewItem) => (
-                  <div className="flex gap-4">
+                  <div className="flex gap-4" key={reviewItem?._id ?? `${reviewItem?.userId}-${reviewItem?.productId}`}>
                     <Avatar className="w-10 h-10 border">
                       <AvatarFallback>
                         {reviewItem?.userName[0].toUpperCase()}

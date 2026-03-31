@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/sheet";
 import { toast } from 'react-toastify';
 import { addProductFormElements } from "@/config";
+import { PackagePlus } from "lucide-react";
 import {
   addNewProduct,
   deleteProduct,
@@ -102,19 +103,29 @@ function AdminProducts() {
     dispatch(fetchAllProducts());
   }, [dispatch]);
 
-  console.log(formData, "productList");
-
   return (
     <Fragment>
-      <div className="mb-5 w-full flex justify-end">
-        <Button onClick={() => setOpenCreateProductsDialog(true)}>
+      <div className="mb-6 rounded-2xl border bg-gradient-to-r from-primary/10 via-background to-accent/10 p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4 shadow-sm">
+        <div>
+          <h1 className="text-2xl font-extrabold tracking-tight text-foreground">Products</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Manage your catalog. {productList?.length || 0} items
+          </p>
+        </div>
+        <Button
+          onClick={() => setOpenCreateProductsDialog(true)}
+          className="rounded-xl font-semibold"
+        >
+          <PackagePlus className="w-4 h-4" />
           Add New Product
         </Button>
       </div>
-      <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
+
+      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {productList && productList.length > 0
           ? productList.map((productItem) => (
               <AdminProductTile
+                key={productItem?._id}
                 setFormData={setFormData}
                 setOpenCreateProductsDialog={setOpenCreateProductsDialog}
                 setCurrentEditedId={setCurrentEditedId}
@@ -132,21 +143,24 @@ function AdminProducts() {
           setFormData(initialFormData);
         }}
       >
-        <SheetContent side="right" className="overflow-auto">
+        <SheetContent side="right" className="overflow-auto bg-gradient-to-b from-background to-muted/30">
           <SheetHeader>
             <SheetTitle>
               {currentEditedId !== null ? "Edit Product" : "Add New Product"}
             </SheetTitle>
           </SheetHeader>
-          <ProductImageUpload
-            imageFile={imageFile}
-            setImageFile={setImageFile}
-            uploadedImageUrl={uploadedImageUrl}
-            setUploadedImageUrl={setUploadedImageUrl}
-            setImageLoadingState={setImageLoadingState}
-            imageLoadingState={imageLoadingState}
-            isEditMode={currentEditedId !== null}
-          />
+          <div className="mt-5 rounded-2xl border bg-white/70 p-4 shadow-sm">
+            <ProductImageUpload
+              imageFile={imageFile}
+              setImageFile={setImageFile}
+              uploadedImageUrl={uploadedImageUrl}
+              setUploadedImageUrl={setUploadedImageUrl}
+              setImageLoadingState={setImageLoadingState}
+              imageLoadingState={imageLoadingState}
+              isEditMode={currentEditedId !== null}
+              isCustomStyling
+            />
+          </div>
           <div className="py-6">
             <CommonForm
               onSubmit={onSubmit}
